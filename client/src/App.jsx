@@ -1,35 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import axios from 'axios';
+import './App.css'; 
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [username, setUsername] = useState('');
+  const [roastData, setRoastData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleRoast = async () => {
+    if (!username) return;
+    setLoading(true);
+    setRoastData(null); 
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/github', { username });
+      setRoastData(response.data);
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong! Check the console.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="container">
+      <h1>🔥 Roast My GitHub</h1>
+      
+      <div className="input-group">
+        <input 
+          type="text" 
+          placeholder="Enter GitHub Username" 
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleRoast()}
+        />
+        <button onClick={handleRoast} disabled={loading}>
+          {loading ? "Roasting..." : "Roast Me!"}
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      {roastData && (
+        <div className="result-card">
+          <img 
+            src={roastData.avatar} 
+            alt="Profile" 
+            className="profile-img"
+          />
+          <h2>{roastData.name}</h2>
+          <p className="stats">@{roastData.username} | ⭐ {roastData.total_stars} Stars | 💻 {roastData.fav_language}</p>
+          
+          <div className="roast-box">
+            <p>{roastData.roast}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;

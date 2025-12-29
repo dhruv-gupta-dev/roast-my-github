@@ -1,49 +1,65 @@
 const axios = require('axios');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+require('dotenv').config();
+
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Use the model that worked: gemini-2.5-flash-lite
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
 exports.getGithubData = async (req, res) => {
     const { username } = req.body;
-    
-    console.log("Received username:", username); 
 
     try {
-        // CALL 1: Get User Profile
-        const response = await axios.get(`https://api.github.com/users/${username}`);
-        const rawData = response.data;
-
-        // CALL 2: Get User Repos
-        const reposResponse = await axios.get(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
-        const repos = reposResponse.data;
-
-        // We loop through every repo and add up the 'stargazers_count'
+        // 1. Fetch Data from GitHub
+        const userRes = await axios.get(`https://api.github.com/users/${username}`);
+        const reposRes = await axios.get(`https://api.github.com/users/${username}/repos?sort=updated&per_page=50`);
+        
+        const user = userRes.data;
+        const repos = reposRes.data;
+        
+        // 2. Calculate Stats 
         const totalStars = repos.reduce((acc, repo) => acc + repo.stargazers_count, 0);
-
-        // This maps the languages and picks the one that shows up the most
         const languages = repos.map(r => r.language).filter(Boolean);
-        const favoriteLanguage = languages.sort((a,b) =>
-              languages.filter(v => v===a).length - languages.filter(v => v===b).length
+        const favLang = languages.sort((a,b) =>
+            languages.filter(v => v===a).length - languages.filter(v => v===b).length
         ).pop() || "None";
 
-        const cleanProfile = {
-            username: rawData.login,       
-            name: rawData.name,
-            bio: rawData.bio,
-            DOC: new Date(rawData.created_at).toDateString(), 
-            public_repos: rawData.public_repos,
-            followers: rawData.followers,
-            following: rawData.following,
+        // 3. Prepare the Prompt for AI
+        const profileSummary = `
+            Username: ${user.login}
+            Bio: "${user.bio || 'No bio'}"
+            Followers: ${user.followers}
+            Total Stars: ${totalStars}
+            Favorite Language: ${favLang}
+            Public Repos: ${user.public_repos}
+            Last Updated: ${new Date(user.updated_at).toDateString()}
+        `;
 
-            total_stars: totalStars, 
-            fav_language: favoriteLanguage,
-            // format the date
-            last_pushed: repos.length > 0 ? new Date(repos[0].pushed_at).toDateString() : "Never",
-            avatar: rawData.avatar_url,
-        };
+        const prompt = `
+            You are a savage technical recruiter who roasts developer portfolios. 
+            Roast this GitHub profile based on the following stats:
+            ${profileSummary}
+            
+            Be short, funny, and mean. Mention their specific language choice and low star count if applicable.
+            Keep it under 100 words.
+        `;
 
-        console.log(cleanProfile); 
-        res.json(cleanProfile);
+
+        const result = await model.generateContent(prompt);
+        const roast = result.response.text();
+
+        res.json({ 
+            username: user.login,
+            name: user.name || user.login,
+            avatar: user.avatar_url,      
+            total_stars: totalStars,      
+            fav_language: favLang,        
+            roast: roast                  
+        });
 
     } catch (error) {
         console.error(error);
-        res.status(404).json({ message: "User not found" });
+        res.status(500).json({ error: "Failed to generate roast" });
     }
 };
