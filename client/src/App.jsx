@@ -7,7 +7,7 @@ function App() {
   const [roastData, setRoastData] = useState(null);
   const [loading, setLoading] = useState(false);
   
-const handleRoast = async () => {
+  const handleRoast = async () => {
     if (!username) return;
     setLoading(true);
     setRoastData(null); 
@@ -18,11 +18,8 @@ const handleRoast = async () => {
       });
       setRoastData(response.data);
     } catch (error) {
-      // Access the specific error message sent by your new controller logic
-      const errorMessage = error.response?.data?.error || "Something went wrong! Check the console.";
-      
-      alert(errorMessage); 
       console.error(error);
+      alert("Something went wrong! Check the console.");
     } finally {
       setLoading(false);
     }
