@@ -13,7 +13,7 @@ function App() {
     setRoastData(null); 
 
     try {
-      const response = await axios.post('https://roast-backend-15fj.onrender.com/github', { username });
+      const response = await axios.post('https://roast-backend-15fj.onrender.com/api/github', { username });
       setRoastData(response.data);
     } catch (error) {
       console.error(error);
