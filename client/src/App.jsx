@@ -65,9 +65,8 @@ const response = await axios.post('https://roast-backend-15fj.onrender.com/api/g
         {/* Visitor Counter Badge */}
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <img 
-            src="https://visitcount.itsvg.in/api?id=roast-my-github-dhruv&label=Roasts+Served&color=12&icon=5&pretty=true" 
-            alt="Visitor Counter" 
-            style={{ height: '30px' }} 
+              src="https://visitor-badge.laobi.icu/badge?page_id=dhruv-gupta-dev.roast-my-github" 
+              alt="Visitor Counter" 
           />
         </div>
       </footer>
