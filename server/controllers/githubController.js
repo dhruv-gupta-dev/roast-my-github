@@ -59,7 +59,10 @@ exports.getGithubData = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to generate roast" });
+    console.error(error.message);
+    if (error.response && error.response.status === 404) {
+        return res.status(404).json({ error: "User not found! Check the spelling." });
     }
+    res.status(500).json({ error: "The AI is overloaded. Try again in a minute!" });
+}
 };

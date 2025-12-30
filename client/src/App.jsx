@@ -18,9 +18,10 @@ function App() {
       });
       setRoastData(response.data);
     } catch (error) {
-      console.error(error);
-      alert("Something went wrong! Check the console.");
-    } finally {
+  const errorMessage = error.response?.data?.error || "Something went wrong!";
+  alert(errorMessage); 
+  console.error(error);
+} finally {
       setLoading(false);
     }
   };
