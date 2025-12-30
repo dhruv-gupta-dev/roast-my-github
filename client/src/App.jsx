@@ -58,7 +58,22 @@ const response = await axios.post('https://roast-backend-15fj.onrender.com/api/g
           </div>
         </div>
       )}
+
+      <footer style={{ marginTop: '4rem', textAlign: 'center', color: '#888' }}>
+        <p style={{ marginBottom: '10px' }}>Made with ❤️ by Dhruv Gupta</p>
+        
+        {/* Visitor Counter Badge */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <img 
+            src="https://visitcount.itsvg.in/api?id=roast-my-github-dhruv&label=Roasts+Served&color=12&icon=5&pretty=true" 
+            alt="Visitor Counter" 
+            style={{ height: '30px' }} 
+          />
+        </div>
+      </footer>
+
     </div>
+
   );
 }
 
