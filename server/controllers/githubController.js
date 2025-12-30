@@ -9,11 +9,16 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
 exports.getGithubData = async (req, res) => {
     const { username } = req.body;
-
+    const config = {
+        headers: {
+            Authorization: `token ${process.env.GITHUB_TOKEN}`
+        }
+    };
     try {
-        // 1. Fetch Data from GitHub
-        const userRes = await axios.get(`https://api.github.com/users/${username}`);
-        const reposRes = await axios.get(`https://api.github.com/users/${username}/repos?sort=updated&per_page=50`);
+
+// 1. Fetch Data from GitHub (Corrected with config)
+const userRes = await axios.get(`https://api.github.com/users/${username}`, config);
+const reposRes = await axios.get(`https://api.github.com/users/${username}/repos?sort=updated&per_page=50`, config);
         
         const user = userRes.data;
         const repos = reposRes.data;
