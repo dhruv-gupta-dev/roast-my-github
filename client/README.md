@@ -1,16 +1,51 @@
-# React + Vite
+# 🔥 Roast My GitHub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An AI-powered application that analyzes GitHub profiles and generates a savage, humorous "roast" based on your coding stats, languages, and bio.
 
-Currently, two official plugins are available:
+**🚀 Live Demo:** [CLICK HERE TO GET ROASTED](https://roast-my-github-sandy.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![Project Screenshot](client/public/screenshot.png)
 
-## React Compiler
+## 🌟 Features
+- **Real-time GitHub Data:** Fetches user stats, repositories, and activity using the GitHub API.
+- **AI Analysis:** Uses Google Gemini AI to generate unique, witty, and personalized roasts.
+- **Cyberpunk UI:** A fully responsive, dark-mode interface built with React.
+- **Full Stack:** Secure backend proxy to handle API keys and logic.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Tech Stack
+- **Frontend:** React + Vite
+- **Backend:** Node.js + Express
+- **AI Engine:** gemini-2.5-flash-lite
+- **Styling:** CSS3 (Custom Cyberpunk Theme)
+- **Deployment:** Vercel (Frontend) & Render (Backend)
 
-## Expanding the ESLint configuration
+## ⚡ Getting Started Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+If you want to run this project on your own machine:
+
+1. **Clone the repository**
+
+   ```bash
+   git clone [https://github.com/dhruv-gupta-dev/roast-my-github.git](https://github.com/your-username/roast-my-github.git)
+   cd roast-my-github
+
+2. **Setup Backend**
+
+    cd server
+    npm install
+    # Create a .env file and add your GEMINI_API_KEY
+    npm start
+
+3. **Setup Frontend**
+
+    cd client
+    npm install
+    npm run dev
+
+
+## 🛡️ Security
+
+- **API keys are secured server-side.**
+- **No personal data is stored; requests are processed in real-time.**
+
+# Made by Dhruv Gupta.
