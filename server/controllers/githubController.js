@@ -59,7 +59,25 @@ exports.getGithubData = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to generate roast" });
+        console.error("Error details:", error.message);
+
+        // 1. Check if the error is from GitHub (e.g., User Not Found)
+         if (error.response && error.response.status === 404) {
+             return res.status(404).json({ 
+            error: "That user doesn't exist! Are you sure they are even a developer? 🕵️" 
+            });
+        }
+
+        // 2. Check for secondary rate limits or other GitHub issues
+        if (error.response && error.response.status === 403) {
+            return res.status(403).json({ 
+                error: "GitHub is ignoring me right now. Try again in a minute! ⏳" 
+            });
+        }
+
+        // 3. Fallback for server or Gemini AI crashes
+        res.status(500).json({ 
+        error: "The AI is too tired to roast right now. Maybe their code is actually okay? 💤" 
+         });
     }
 };
