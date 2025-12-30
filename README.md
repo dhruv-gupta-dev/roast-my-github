@@ -24,20 +24,19 @@ An AI-powered application that analyzes GitHub profiles and generates a savage, 
 If you want to run this project on your own machine:
 
 1. **Clone the repository**
-
    ```bash
-   git clone [https://github.com/dhruv-gupta-dev/roast-my-github.git](https://github.com/your-username/roast-my-github.git)
+   git clone https://github.com/dhruv-gupta-dev/roast-my-github.git
    cd roast-my-github
 
 2. **Setup Backend**
-
+    ```bash
     cd server
     npm install
     # Create a .env file and add your GEMINI_API_KEY
     npm start
 
 3. **Setup Frontend**
-
+    ```bash
     cd client
     npm install
     npm run dev
