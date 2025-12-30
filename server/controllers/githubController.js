@@ -4,9 +4,9 @@ require('dotenv').config();
 
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-// Use the model that worked: gemini-2.0-flash
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
+// Use the model that worked: gemini-2.5-flash-lite
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+sh
 exports.getGithubData = async (req, res) => {
     const { username } = req.body;
     const config = {
