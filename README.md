@@ -8,14 +8,14 @@ An AI-powered application that analyzes GitHub profiles and generates a savage, 
 
 ## 🌟 Features
 - **Real-time GitHub Data:** Fetches user stats, repositories, and activity using the GitHub API.
-- **AI Analysis:** Uses Google Gemini AI to generate unique, witty, and personalized roasts.
+- **⚡ Ultra-Fast AI Analysis:** Powered by **Groq** (running **Meta Llama 3**) for instant, low-latency roasts.
 - **Cyberpunk UI:** A fully responsive, dark-mode interface built with React.
 - **Full Stack:** Secure backend proxy to handle API keys and logic.
 
 ## 🛠️ Tech Stack
 - **Frontend:** React + Vite
 - **Backend:** Node.js + Express
-- **AI Engine:** gemini-2.5-flash-lite
+- **AI Engine:** Groq SDK (Model: llama-3.3-70b-versatile)
 - **Styling:** CSS3 (Custom Cyberpunk Theme)
 - **Deployment:** Vercel (Frontend) & Render (Backend)
 

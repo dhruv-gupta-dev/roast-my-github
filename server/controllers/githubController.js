@@ -1,72 +1,107 @@
 const axios = require('axios');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const Groq = require("groq-sdk");
 require('dotenv').config();
 
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-// Use the model that worked: gemini-2.5-flash-lite
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 exports.getGithubData = async (req, res) => {
     const { username } = req.body;
-    const config = {
-        headers: {
-            Authorization: `token ${process.env.GITHUB_TOKEN}`
-        }
-    };
-    try {
 
-// 1. Fetch Data from GitHub (Corrected with config)
-const userRes = await axios.get(`https://api.github.com/users/${username}`, config);
-const reposRes = await axios.get(`https://api.github.com/users/${username}/repos?sort=updated&per_page=50`, config);
-        
+    const config = {
+        headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` }
+    };
+
+    try {
+        // 1. Parallel Data Fetching
+        const [userRes, reposRes] = await Promise.all([
+            axios.get(`https://api.github.com/users/${username}`, config),
+            axios.get(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`, config)
+        ]);
+
         const user = userRes.data;
         const repos = reposRes.data;
+
+        // 2. Advanced Stat Calculation 
+        const totalStars = repos.reduce((acc, r) => acc + r.stargazers_count, 0);
+        const totalForks = repos.filter(r => r.fork).length;
+        const ownRepos = repos.length - totalForks;
         
-        // 2. Calculate Stats 
-        const totalStars = repos.reduce((acc, repo) => acc + repo.stargazers_count, 0);
+        // Calculate "Clout Ratio" (Desperation index)
+        const following = user.following || 1; 
+        const ratio = (user.followers / following).toFixed(2);
+        
+        // Language Analysis
         const languages = repos.map(r => r.language).filter(Boolean);
         const favLang = languages.sort((a,b) =>
             languages.filter(v => v===a).length - languages.filter(v => v===b).length
         ).pop() || "None";
 
-        // 3. Prepare the Prompt for AI
-        const profileSummary = `
-            Username: ${user.login}
-            Bio: "${user.bio || 'No bio'}"
-            Followers: ${user.followers}
-            Total Stars: ${totalStars}
-            Favorite Language: ${favLang}
-            Public Repos: ${user.public_repos}
-            Last Updated: ${new Date(user.updated_at).toDateString()}
+        // Activity Check (Is this account dead?)
+        const lastUpdate = new Date(user.updated_at);
+        const daysSinceUpdate = Math.floor((new Date() - lastUpdate) / (1000 * 60 * 60 * 24));
+        const isDead = daysSinceUpdate > 180; // 6 months inactive
+
+        // 3. Construct the "Savage Context"
+        const profileStats = `
+            - Username: ${user.login}
+            - Bio: "${user.bio || 'Empty (Lazy)'}"
+            - Followers: ${user.followers} (Following: ${user.following}) -> Ratio: ${ratio}
+            - Total Stars: ${totalStars} across ${user.public_repos} repos
+            - Forked Repos: ${totalForks} (Original work: ${ownRepos})
+            - Main Language: ${favLang}
+            - Last Active: ${daysSinceUpdate} days ago ${isDead ? "(Officially Dead)" : ""}
+            - Company: "${user.company || 'Unemployed'}"
+            - Location: "${user.location || 'Unknown'}"
         `;
 
-        const prompt = `
-            You are a savage technical recruiter who roasts developer portfolios. 
-            Roast this GitHub profile based on the following stats:
-            ${profileSummary}
+        // 4. The "Good" System Prompt
+        const systemPrompt = `
+            You are a cynical, elite Senior DevOps Engineer at a FAANG company. 
+            You judge developers based on their GitHub metrics. You are mean, funny, and technically sharp.
             
-            Be short, funny, and mean. Mention their specific language choice and low star count if applicable.
-            Keep it under 100 words.
+            Here are your rules for roasting:
+            1. If they have high followers but low stars, call them an "influencer wannabe" who doesn't code.
+            2. If they have many forks (${totalForks}), accuse them of just copying other people's work.
+            3. If their ratio is below 0.5, mock them for following everyone to get followers back.
+            4. Stereotype them heavily based on their main language (${favLang}).
+            5. If they are inactive (${daysSinceUpdate} days), ask if they quit coding to become a manager.
+            6. Keep it under 100 words. Brutal honesty. No hashtags.
         `;
 
+        // 5. Call Groq (Llama 3.3)
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: `Roast this specific profile details:\n${profileStats}` }
+            ],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.8, // Slightly higher for more creative insults
+            max_tokens: 200,
+        });
 
-        const result = await model.generateContent(prompt);
-        const roast = result.response.text();
+        const roast = chatCompletion.choices[0]?.message?.content || "This profile is so boring I can't even roast it.";
 
+        // 6. Send JSON
         res.json({ 
             username: user.login,
             name: user.name || user.login,
             avatar: user.avatar_url,      
             total_stars: totalStars,      
-            fav_language: favLang,        
+            fav_language: favLang,
+            followers: user.followers,
+            following: user.following,
             roast: roast                  
         });
 
     } catch (error) {
-    console.error(error.message);
-    if (error.response && error.response.status === 404) {
-        return res.status(404).json({ error: "User not found! Check the spelling." });
+        console.error("Roast Error:", error.message);
+        
+        if (error.response && error.response.status === 404) {
+            return res.status(404).json({ error: "User not found. Are you sure they exist?" });
+        }
+        if (error.error && error.error.code === 'rate_limit_exceeded') {
+             return res.status(429).json({ error: "The roasting oven is overheated. Try again in a minute." });
+        }
+        res.status(500).json({ error: "Server crashed. Probably a skill issue." });
     }
-    res.status(500).json({ error: "The AI is overloaded. Try again in a minute!" });
-}
 };
