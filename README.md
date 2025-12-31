@@ -4,7 +4,7 @@ An AI-powered application that analyzes GitHub profiles and generates a savage, 
 
 **🚀 Live Demo:** [CLICK HERE TO GET ROASTED](https://roast-my-github-sandy.vercel.app/)
 
-![Project Screenshot](image.png)
+![Project Screenshot](client\public\image.png)
 
 ## 🌟 Features
 - **Real-time GitHub Data:** Fetches user stats, repositories, and activity using the GitHub API.
