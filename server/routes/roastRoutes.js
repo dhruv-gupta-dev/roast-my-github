@@ -4,4 +4,4 @@ const { getGithubData } = require('../controllers/githubController');
 
 router.post('/github', getGithubData);
 
-module.exports = router;
+module.exports = router;  

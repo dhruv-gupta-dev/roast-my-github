@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import './App.css'; 
 
@@ -6,7 +6,7 @@ function App() {
   const [username, setUsername] = useState('');
   const [roastData, setRoastData] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   const handleRoast = async () => {
     if (!username) return;
     setLoading(true);
@@ -29,7 +29,7 @@ function App() {
   return (
     <div className="container">
       <h1>🔥 Roast My GitHub</h1>
-      
+
       <div className="input-group">
         <input 
           type="text" 
@@ -52,7 +52,7 @@ function App() {
         </div>
       )}
 
-      {/* 2. THIS IS THE UI THAT USES THE LOGIC */}
+      
       <footer style={{ marginTop: '4rem', textAlign: 'center', color: '#888' }}>
         <p style={{ marginBottom: '10px' }}>Made with ❤️ by Dhruv Gupta</p>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
