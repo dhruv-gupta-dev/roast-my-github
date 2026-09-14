@@ -74,7 +74,7 @@ exports.getGithubData = async (req, res) => {
                 { role: "system", content: systemPrompt },
                 { role: "user", content: `Roast this specific profile details:\n${profileStats}` }
             ],
-            model: "llama-3.3-70b-versatile",
+            model: "openai/gpt-oss-120b",
             temperature: 0.8, // Slightly higher for more creative insults
             max_tokens: 300,
         });
